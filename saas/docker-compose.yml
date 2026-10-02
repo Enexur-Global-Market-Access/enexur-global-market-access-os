@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: enexur
+      POSTGRES_USER: enexur
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U enexur -d enexur"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  api:
+    build: .
+    restart: unless-stopped
+    command: ["sh", "-c", "pnpm db:migrate && pnpm start"]
+    environment:
+      NODE_ENV: production
+      PORT: 4100
+      DATABASE_URL: postgresql://enexur:${POSTGRES_PASSWORD}@db:5432/enexur?schema=public
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      WEB_ORIGIN: ${WEB_ORIGIN:?Set WEB_ORIGIN to your HTTPS URL}
+      SESSION_COOKIE_NAME: enexur_session
+    depends_on:
+      db:
+        condition: service_healthy
+  web:
+    build: .
+    restart: unless-stopped
+    command: ["nginx", "-g", "daemon off;"]
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    depends_on:
+      - api
+volumes:
+  postgres_data:

@@ -1,0 +1,181 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENT_ADMIN
+  CLIENT_EXECUTIVE
+  CLIENT_ANALYST
+  CLIENT_SALES
+  CLIENT_VIEWER
+  ENEXUR_ADMIN
+  ENEXUR_ANALYST
+  ENEXUR_SALES
+  ENEXUR_OPERATIONS
+  ENEXUR_PARTNER
+}
+
+enum OpportunityStage {
+  DISCOVERY
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  CONFIRMED
+  EXECUTION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum AssessmentStatus {
+  IN_PROGRESS
+  SUBMITTED
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  name         String
+  passwordHash String
+  verifiedAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  memberships  WorkspaceMember[]
+  sessions     Session[]
+  auditLogs    AuditLog[]
+}
+
+model Organization {
+  id          String      @id @default(uuid()) @db.Uuid
+  name        String
+  createdAt   DateTime    @default(now())
+  workspaces  Workspace[]
+}
+
+model Workspace {
+  id             String      @id @default(uuid()) @db.Uuid
+  organizationId String      @db.Uuid
+  name           String
+  createdAt      DateTime    @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members        WorkspaceMember[]
+  companies      Company[]
+  opportunities  Opportunity[]
+  assessments    Assessment[]
+  tasks          Task[]
+  auditLogs      AuditLog[]
+  integrations   Integration[]
+  @@index([organizationId])
+}
+
+model WorkspaceMember {
+  id          String   @id @default(uuid()) @db.Uuid
+  workspaceId String   @db.Uuid
+  userId      String   @db.Uuid
+  role        Role     @default(CLIENT_ADMIN)
+  createdAt   DateTime @default(now())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([workspaceId, userId])
+  @@index([userId])
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  tokenHash String   @unique
+  userId    String   @db.Uuid
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, expiresAt])
+}
+
+model Company {
+  id          String   @id @default(uuid()) @db.Uuid
+  workspaceId String   @db.Uuid
+  name        String
+  country     String?
+  sector      String?
+  website     String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  opportunities Opportunity[]
+  @@index([workspaceId, createdAt])
+  @@index([workspaceId, name])
+}
+
+model Opportunity {
+  id          String           @id @default(uuid()) @db.Uuid
+  workspaceId String           @db.Uuid
+  companyId   String?          @db.Uuid
+  name        String
+  stage       OpportunityStage @default(DISCOVERY)
+  value       Decimal          @default(0) @db.Decimal(14, 2)
+  currency    String           @default("USD") @db.Char(3)
+  closeDate   DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  company     Company?         @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  @@index([workspaceId, stage])
+  @@index([workspaceId, createdAt])
+}
+
+model Assessment {
+  id          String           @id @default(uuid()) @db.Uuid
+  workspaceId String           @db.Uuid
+  companyName String?
+  answers     Json             @default("{}")
+  score       Int?
+  result      Json?
+  status      AssessmentStatus @default(IN_PROGRESS)
+  submittedAt DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  @@index([workspaceId, createdAt])
+  @@index([workspaceId, status])
+}
+
+model Task {
+  id          String    @id @default(uuid()) @db.Uuid
+  workspaceId String    @db.Uuid
+  title       String
+  status      String    @default("OPEN")
+  dueAt       DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  @@index([workspaceId, status])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  workspaceId String   @db.Uuid
+  actorId     String?  @db.Uuid
+  action      String
+  entity      String
+  entityId    String?
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  actor       User?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  @@index([workspaceId, createdAt])
+}
+
+model Integration {
+  id          String   @id @default(uuid()) @db.Uuid
+  workspaceId String   @db.Uuid
+  provider    String
+  status      String   @default("NOT_CONNECTED")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  @@unique([workspaceId, provider])
+}
