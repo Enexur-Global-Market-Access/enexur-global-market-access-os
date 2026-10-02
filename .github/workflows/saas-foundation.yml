@@ -1,0 +1,43 @@
+name: SaaS foundation CI
+on:
+  push:
+    branches: [main, saas-foundation]
+  pull_request:
+    branches: [main]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: enexur_test
+          POSTGRES_USER: enexur
+          POSTGRES_PASSWORD: enexur_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U enexur -d enexur_test"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://enexur:enexur_test@localhost:5432/enexur_test?schema=public
+      NODE_ENV: test
+      WEB_ORIGIN: http://localhost:5173
+    defaults:
+      run:
+        working-directory: saas
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: saas/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm db:generate
+      - run: pnpm db:migrate
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
