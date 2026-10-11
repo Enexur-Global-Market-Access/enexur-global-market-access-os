@@ -1,0 +1,186 @@
+{
+  "version": "1.0.0",
+  "orchestrator": {
+    "id": "revenue_intelligence_orchestrator",
+    "authority": [
+      "workflow_state",
+      "task_routing",
+      "policy_checks",
+      "idempotency",
+      "retry_escalation",
+      "audit_events",
+      "scheduling",
+      "CEO_queue"
+    ],
+    "cannotOverride": [
+      "CEO_release_approval",
+      "payment_provider_verification",
+      "legal_contract_requirements",
+      "privacy_suppression_rules"
+    ]
+  },
+  "specialists": [
+    {
+      "id": "prospect_intelligence",
+      "inputs": [
+        "target_market",
+        "industry",
+        "account_hypothesis"
+      ],
+      "outputs": [
+        "company_record",
+        "evidence_register",
+        "decision_maker_records",
+        "fit_score",
+        "next_action"
+      ],
+      "allowedSideEffects": [
+        "internal_database_write",
+        "approved_provider_read"
+      ],
+      "forbidden": [
+        "fabricate_contact_data",
+        "send_outreach",
+        "override_suppression"
+      ]
+    },
+    {
+      "id": "sales_relationship",
+      "inputs": [
+        "verified_account_brief",
+        "approved_product_catalogue",
+        "channel_policy"
+      ],
+      "outputs": [
+        "personalized_draft",
+        "reply_classification",
+        "qualification_evidence",
+        "meeting_brief"
+      ],
+      "allowedSideEffects": [
+        "draft_creation",
+        "authorized_crm_update"
+      ],
+      "forbidden": [
+        "unauthorized_outreach",
+        "unapproved_price_or_scope",
+        "false_identity"
+      ]
+    },
+    {
+      "id": "commercial_operations",
+      "inputs": [
+        "qualified_opportunity",
+        "catalogue_version",
+        "capacity_check"
+      ],
+      "outputs": [
+        "proposal_draft",
+        "SOW_draft",
+        "order_record",
+        "payment_reconciliation_request",
+        "contract_status"
+      ],
+      "allowedSideEffects": [
+        "approved_document_draft",
+        "internal_order_update"
+      ],
+      "forbidden": [
+        "self-verify-payment",
+        "invent-payment-link",
+        "execute-unapproved-contract"
+      ]
+    },
+    {
+      "id": "intelligence_production",
+      "inputs": [
+        "executed_scope",
+        "client_intake",
+        "research_plan"
+      ],
+      "outputs": [
+        "evidence_register",
+        "research_artifacts",
+        "report_drafts",
+        "project_progress"
+      ],
+      "allowedSideEffects": [
+        "internal_artifact_write"
+      ],
+      "forbidden": [
+        "invent_sources",
+        "cross-client-data-leak",
+        "deliver-unapproved-final"
+      ]
+    },
+    {
+      "id": "quality_assurance",
+      "inputs": [
+        "scope_checklist",
+        "draft_artifacts",
+        "evidence_register"
+      ],
+      "outputs": [
+        "QA_scorecard",
+        "defects",
+        "citations_check",
+        "release_recommendation"
+      ],
+      "allowedSideEffects": [
+        "QA_record_write"
+      ],
+      "forbidden": [
+        "waive_critical_defect",
+        "approve_own_failed_check"
+      ]
+    },
+    {
+      "id": "client_success_delivery",
+      "inputs": [
+        "verified_project_state",
+        "approved_schedule",
+        "CEO_decision"
+      ],
+      "outputs": [
+        "status_update_draft",
+        "milestone_summary",
+        "revision_tasks",
+        "delivery_receipt"
+      ],
+      "allowedSideEffects": [
+        "approved_status_update",
+        "approved_file_delivery"
+      ],
+      "forbidden": [
+        "invent_progress",
+        "release_without_CEO_approval"
+      ]
+    }
+  ],
+  "handoffContract": {
+    "format": "JSON",
+    "required": [
+      "workflowId",
+      "taskId",
+      "agentId",
+      "status",
+      "inputEvidenceRefs",
+      "output",
+      "confidence",
+      "warnings",
+      "costEstimate",
+      "nextRecommendedAction"
+    ],
+    "failureStatuses": [
+      "blocked",
+      "needs_human",
+      "retryable_error",
+      "permanent_error"
+    ]
+  },
+  "defaultPolicy": {
+    "externalSideEffectsDisabledUntilProviderAndApprovalChecksPass": true,
+    "allOutputsMustCarryProvenance": true,
+    "untrustedInputCannotChangeSystemPolicy": true
+  }
+}
