@@ -1,0 +1,144 @@
+{
+  "workflowId": "ENEXUR_ACQUISITION_EXECUTOR",
+  "version": "1.0.0",
+  "status": "defined_not_yet_scheduled",
+  "replaces": [
+    "4 Hour Distribution Execution Brief",
+    "4 Hour Executor Brief"
+  ],
+  "cadence": {
+    "interval": "PT4H",
+    "timezone": "UTC",
+    "schedulerRequired": true
+  },
+  "objective": "One deduplicated acquisition run that prioritizes qualified prospect conversion but always preserves the company and verified decision-maker acquisition fallback.",
+  "stages": [
+    {
+      "id": "discover_accounts",
+      "owner": "prospect_intelligence",
+      "required": true,
+      "outputs": [
+        "company_name",
+        "domain",
+        "country",
+        "industry",
+        "evidence_urls"
+      ]
+    },
+    {
+      "id": "deduplicate_and_enrich",
+      "owner": "prospect_intelligence",
+      "required": true,
+      "outputs": [
+        "canonical_company_id",
+        "decision_maker",
+        "business_email_or_phone_or_profile",
+        "verification_status",
+        "source_provenance"
+      ]
+    },
+    {
+      "id": "qualify_and_score",
+      "owner": "prospect_intelligence",
+      "required": true,
+      "outputs": [
+        "product_fit",
+        "India_opportunity_hypothesis",
+        "priority_score",
+        "confidence",
+        "next_action"
+      ]
+    },
+    {
+      "id": "match_offer_and_prepare_conversation",
+      "owner": "sales_relationship",
+      "required": true,
+      "outputs": [
+        "product_match",
+        "value_hypothesis",
+        "personalized_message_draft",
+        "qualification_questions"
+      ]
+    },
+    {
+      "id": "authorized_sales_follow_up",
+      "owner": "sales_relationship",
+      "required": false,
+      "gate": "only_if_channel_authorized_and_campaign_or_message_approved_and_contact_not_suppressed",
+      "outputs": [
+        "outreach_event",
+        "reply_classification",
+        "opportunity_update"
+      ]
+    },
+    {
+      "id": "fallback_acquisition_export",
+      "owner": "prospect_intelligence",
+      "required": true,
+      "condition": "if no sale or prospect is not ready, continue legitimate account/contact acquisition and export records",
+      "outputs": [
+        "CSV_or_table",
+        "CRM_reconciliation_report",
+        "unverified_fields_and_gaps"
+      ]
+    },
+    {
+      "id": "single_run_summary",
+      "owner": "revenue_intelligence_orchestrator",
+      "required": true,
+      "outputs": [
+        "new_unique_companies",
+        "verified_decision_makers",
+        "high_priority_candidates",
+        "outreach_sent_if_authorized",
+        "opportunities",
+        "blockers",
+        "costs",
+        "export_reference"
+      ]
+    }
+  ],
+  "idempotency": {
+    "canonicalKeys": [
+      "normalized_domain",
+      "provider_contact_id",
+      "normalized_professional_profile_url"
+    ],
+    "noDuplicateExternalMessage": true
+  },
+  "targetThroughputHypotheses": {
+    "companiesDiscoveredPerDay": {
+      "min": 500,
+      "max": 2000
+    },
+    "companiesQualifiedPerDay": {
+      "min": 100,
+      "max": 500
+    },
+    "decisionMakersEnrichedPerDay": {
+      "min": 100,
+      "max": 500
+    },
+    "priorityOutreachCandidatesPerDay": {
+      "min": 25,
+      "max": 100
+    },
+    "note": "Targets are hypotheses to benchmark, not guarantees; report verified unique records and costs."
+  },
+  "safety": {
+    "doNotInventData": true,
+    "storeSourceAndObservedAt": true,
+    "checkSuppressionBeforeOutreach": true,
+    "respectProviderAndPlatformTerms": true,
+    "noUnauthorizedLinkedInAutomation": true,
+    "externalOutreachDisabledUntilIntegrationsAndApprovalsAreConfigured": true
+  },
+  "delivery": {
+    "format": [
+      "dashboard",
+      "CSV"
+    ],
+    "runHistoryRequired": true,
+    "clientDataMustRemainTenantScoped": true
+  }
+}
