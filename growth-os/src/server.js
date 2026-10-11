@@ -1,5 +1,6 @@
 import express from "express";
 import { randomUUID } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import {
   buildAuditEvent, createWorkflow, routeSpecialist, transitionWorkflow, WORKFLOW_STATES
 } from "./domain.js";
@@ -85,6 +86,24 @@ app.get("/api/v1/meta", auth, (_req, res) => res.json({
   }).map(([id, purpose]) => ({ id, purpose })),
   integrations: { crm: "not_connected_by_this_service", prospecting: "not_connected_by_this_service", payments: "not_connected_by_this_service", e_signature: "not_connected_by_this_service" }
 }));
+
+app.get("/api/v1/catalog/products", auth, async (_req, res) => {
+  try {
+    const raw = await readFile(new URL("../config/product-catalog.json", import.meta.url), "utf8");
+    res.json(JSON.parse(raw));
+  } catch {
+    res.status(500).json({ error: "PRODUCT_CATALOG_UNAVAILABLE" });
+  }
+});
+
+app.get("/api/v1/orchestration/acquisition", auth, async (_req, res) => {
+  try {
+    const raw = await readFile(new URL("../config/acquisition-orchestration.json", import.meta.url), "utf8");
+    res.json(JSON.parse(raw));
+  } catch {
+    res.status(500).json({ error: "ACQUISITION_POLICY_UNAVAILABLE" });
+  }
+});
 
 app.get("/api/v1/workflows", auth, async (req, res) => {
   try {
