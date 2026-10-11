@@ -49,6 +49,8 @@ Generate strong random secrets and keep them in a secret manager. Never commit r
 
 - `GET /health` — health status.
 - `GET /api/v1/meta` — states and specialist roles (authenticated).
+- `GET /api/v1/catalog/products` — versioned product catalogue and launch controls (authenticated).
+- `GET /api/v1/orchestration/acquisition` — merged four-hour acquisition workflow definition (authenticated; definition only, not scheduled yet).
 - `GET /api/v1/workflows` — list workflows; optional `state` and `limit`.
 - `POST /api/v1/workflows` — create a prospect workflow; JSON body must include `companyName`.
 - `GET /api/v1/workflows/:id` — read workflow.
@@ -65,7 +67,7 @@ The `APPROVED_FOR_RELEASE` transition requires the CEO token and explicit eviden
 2. Add a durable queue/workflow engine with retries, leases, idempotency keys and dead-letter handling.
 3. Add provider adapters with explicit capability and permission checks.
 4. Connect HubSpot CRM with schema discovery and reconciliation before any writes.
-5. Consolidate the two existing four-hour acquisition briefs into one scheduled acquisition workflow, preserving prospect-enrichment fallback.
+5. Implement a durable scheduler for the merged four-hour acquisition workflow defined in `config/acquisition-orchestration.json`, preserving prospect-enrichment fallback.
 6. Add payment webhook signature verification and reconciliation.
 7. Add contract lifecycle and client project workspace integrations.
 8. Implement product-specific research pipelines, source registry, QA rubric and CEO review UI.
