@@ -42,8 +42,9 @@ const TRANSITIONS = {
   CLOSED: [], LOST: [], BLOCKED: ["RESEARCHED", "CONTACTABLE", "IN_PRODUCTION", "QA"]
 };
 
-const CEO_ONLY_TARGETS = new Set(["APPROVED_FOR_RELEASE"]);
-const CEO_ONLY_ACTORS = new Set(["ceo", "admin"]);
+const CEO_ONLY_TARGETS = new Set(["APPROVED_FOR_OUTREACH", "ORDER_ACCEPTED", "CONTRACTED", "APPROVED_FOR_RELEASE"]);
+const CEO_ROLES = new Set(["ceo", "admin"]);
+const FINANCE_ROLES = new Set(["ceo", "admin", "finance"]);
 const TERMINAL_STATES = new Set(["CLOSED", "LOST"]);
 
 export function canTransition(from, to) {
@@ -58,7 +59,7 @@ export function transitionWorkflow(workflow, toState, actor, evidence = {}) {
     throw new Error(`INVALID_TRANSITION:${workflow.state}->${toState}`);
   }
   if (TERMINAL_STATES.has(workflow.state)) throw new Error("WORKFLOW_TERMINAL");
-  if (CEO_ONLY_TARGETS.has(toState) && !CEO_ONLY_ACTORS.has(actor?.role)) {
+  if (CEO_ONLY_TARGETS.has(toState) && !CEO_ROLES.has(actor?.role)) {
     throw new Error("CEO_APPROVAL_REQUIRED");
   }
   if (toState === "CONTACTABLE" && evidence.contactVerified !== true) {
@@ -68,6 +69,9 @@ export function transitionWorkflow(workflow, toState, actor, evidence = {}) {
     if (evidence.outreachApproved !== true) throw new Error("OUTREACH_APPROVAL_REQUIRED");
     if (evidence.optedOut === true || evidence.suppressed === true) throw new Error("CONTACT_SUPPRESSED");
     if (evidence.channelAuthorized !== true) throw new Error("AUTHORIZED_CHANNEL_REQUIRED");
+    if (typeof evidence.approvalReference !== "string" || !evidence.approvalReference.trim()) {
+      throw new Error("OUTREACH_APPROVAL_REFERENCE_REQUIRED");
+    }
   }
   if (toState === "QUALIFIED_OPPORTUNITY") {
     const required = ["needConfirmed", "stakeholderIdentified", "nextStepRecorded"];
@@ -76,10 +80,14 @@ export function transitionWorkflow(workflow, toState, actor, evidence = {}) {
   if (toState === "ORDER_ACCEPTED" && evidence.commercialApproved !== true) {
     throw new Error("COMMERCIAL_APPROVAL_REQUIRED");
   }
-  if (toState === "PAID" && evidence.paymentProviderVerified !== true) {
-    throw new Error("PAYMENT_NOT_VERIFIED");
+  if (toState === "PAID") {
+    if (!FINANCE_ROLES.has(actor?.role) || evidence.paymentProviderVerified !== true ||
+        typeof evidence.paymentProviderReference !== "string" || !evidence.paymentProviderReference.trim()) {
+      throw new Error("PAYMENT_NOT_VERIFIED");
+    }
   }
-  if (toState === "CONTRACTED" && evidence.contractExecuted !== true) {
+  if (toState === "CONTRACTED" && (evidence.contractExecuted !== true ||
+      typeof evidence.contractReference !== "string" || !evidence.contractReference.trim())) {
     throw new Error("EXECUTED_CONTRACT_REQUIRED");
   }
   if (toState === "IN_PRODUCTION" && evidence.kickoffPrerequisitesMet !== true) {
