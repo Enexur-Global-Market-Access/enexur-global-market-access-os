@@ -16,6 +16,7 @@ const PORT = Number(process.env.PORT || 8080);
 const NODE_ENV = process.env.NODE_ENV || "development";
 const API_TOKEN = process.env.GROWTH_OS_API_TOKEN;
 const CEO_TOKEN = process.env.GROWTH_OS_CEO_TOKEN;
+const FINANCE_TOKEN = process.env.GROWTH_OS_FINANCE_TOKEN;
 
 function safeEqual(a, b) {
   if (!a || !b || a.length !== b.length) return false;
@@ -32,6 +33,10 @@ function auth(req, res, next) {
   const token = (req.get("authorization") || "").replace(/^Bearer\s+/i, "");
   if (CEO_TOKEN && safeEqual(token, CEO_TOKEN)) {
     req.actor = { id: "ceo-token", role: "ceo" };
+    return next();
+  }
+  if (FINANCE_TOKEN && safeEqual(token, FINANCE_TOKEN)) {
+    req.actor = { id: "finance-token", role: "finance" };
     return next();
   }
   if (API_TOKEN && safeEqual(token, API_TOKEN)) {
