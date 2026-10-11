@@ -39,7 +39,8 @@ The API listens on port 8080 by default. `GET /health` is a health check. Protec
 - `MONGODB_URI`: MongoDB connection string; required for persistence.
 - `MONGODB_DB`: database name, default `enexur_growth_os`.
 - `GROWTH_OS_API_TOKEN`: server-to-server API token.
-- `GROWTH_OS_CEO_TOKEN`: separate CEO token used for final release approval.
+- `GROWTH_OS_CEO_TOKEN`: separate CEO token used for outreach/order/contract approval and final release approval.
+- `GROWTH_OS_FINANCE_TOKEN`: separate finance token used for payment reconciliation transitions.
 - `DEV_AUTH_BYPASS`: local development only; default false.
 
 Generate strong random secrets and keep them in a secret manager. Never commit real tokens or connection strings.
