@@ -1,0 +1,27 @@
+name: Growth OS foundation CI
+
+on:
+  push:
+    branches: [main, "growth-os-v1-orchestrator-foundation"]
+    paths:
+      - "growth-os/**"
+      - ".github/workflows/growth-os.yml"
+  pull_request:
+    paths:
+      - "growth-os/**"
+      - ".github/workflows/growth-os.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: growth-os
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm run check
+      - run: npm test

@@ -1,0 +1,152 @@
+{
+  "catalogueVersion": "2026-10-11.1",
+  "currency": "USD",
+  "note": "Source-of-truth seed based on current ENEXUR working catalogue. Offers marked requires_ceo_confirmation must not be sold or represented as live until the CEO activates them.",
+  "products": [
+    {
+      "code": "INDIA_MARKET_ENTRY_SCORE",
+      "name": "ENEXUR INDIA MARKET ENTRY SCORE™",
+      "price": {
+        "amount": 0,
+        "currency": "USD",
+        "type": "free"
+      },
+      "status": "launched",
+      "proposalAllowed": true,
+      "deliveryType": "diagnostic",
+      "scopeSummary": "Free 10–20 question diagnostic producing an initial India opportunity assessment.",
+      "requiresCEOActivation": false
+    },
+    {
+      "code": "INDIA_MARKET_INTELLIGENCE_ESSENTIAL",
+      "name": "ENEXUR INDIA MARKET INTELLIGENCE™ — Essential",
+      "price": {
+        "amount": 3500,
+        "currency": "USD",
+        "type": "starting_at"
+      },
+      "status": "catalogue_offer_requires_confirmation",
+      "proposalAllowed": false,
+      "deliveryType": "executive_intelligence",
+      "scopeSummary": "Entry-level executive intelligence covering market structure, opportunity, customers, competition, channels, geography, regulation, commercial landscape, risks and a practical entry roadmap.",
+      "requiresCEOActivation": true
+    },
+    {
+      "code": "INDIA_MARKET_INTELLIGENCE_FLAGSHIP",
+      "name": "ENEXUR INDIA MARKET INTELLIGENCE™",
+      "price": {
+        "amount": 7500,
+        "currency": "USD",
+        "type": "fixed_package"
+      },
+      "status": "current_flagship_offer",
+      "proposalAllowed": true,
+      "deliveryType": "executive_intelligence",
+      "defaultDeliveryBusinessDays": 10,
+      "scopeSummary": "Executive Decision Brief, India Market Intelligence Report, Opportunity Model, Competitive Intelligence Matrix, Customer Intelligence Map, Channel Intelligence Map, Geographic Opportunity Map, Regulatory Dependency Map, Pricing & Commercial Landscape, Market Entry Decision Matrix, 90-Day Roadmap, Executive Presentation and Strategy Session.",
+      "requiresCEOActivation": false,
+      "qaGate": {
+        "mandatoryDeliverablesMustBeComplete": true,
+        "criticalDefectsAllowed": 0,
+        "ceoFinalReleaseRequired": true
+      }
+    },
+    {
+      "code": "INDIA_PARTNER_DISCOVERY_CORE",
+      "name": "ENEXUR INDIA PARTNER DISCOVERY™ — Core",
+      "price": {
+        "amount": 18500,
+        "currency": "USD",
+        "type": "fixed_package"
+      },
+      "status": "approved_for_build_and_offer_scope_confirmation",
+      "proposalAllowed": true,
+      "deliveryType": "partner_research_and_qualification",
+      "scope": {
+        "companiesIdentified": 150,
+        "screenedCandidates": 50,
+        "qualifiedProfiles": 25,
+        "priorityCandidatesMin": 12,
+        "priorityCandidatesMax": 15,
+        "outreachAttemptsMin": 30,
+        "outreachAttemptsMax": 40
+      },
+      "scopeSummary": "Landscape scan, partner-fit scoring, capability profiles, lawfully available contact details, 12–15 priority candidates, 30–40 controlled outreach attempts, outreach tracker and executive shortlist report.",
+      "requiresCEOActivation": false,
+      "requiresCapacityCheck": true
+    },
+    {
+      "code": "INDIA_MARKET_ENTRY_INTELLIGENCE",
+      "name": "ENEXUR INDIA MARKET ENTRY INTELLIGENCE™",
+      "price": {
+        "amount": 15000,
+        "currency": "USD",
+        "type": "starting_at"
+      },
+      "status": "catalogue_offer_requires_confirmation",
+      "proposalAllowed": false,
+      "deliveryType": "strategic_advisory",
+      "scopeSummary": "Deeper entry strategy, target-account intelligence, partner/buyer analysis, entry scenarios and longer-term market-entry roadmap.",
+      "requiresCEOActivation": true
+    },
+    {
+      "code": "INDIA_MARKET_ENTRY_PROGRAMME",
+      "name": "ENEXUR INDIA MARKET ENTRY PROGRAMME",
+      "price": {
+        "min": 25000,
+        "max": 50000,
+        "currency": "USD",
+        "type": "range"
+      },
+      "status": "catalogue_offer_requires_confirmation",
+      "proposalAllowed": false,
+      "deliveryType": "managed_market_entry",
+      "scopeSummary": "Managed market-entry programme that may include partner/buyer development, validation, activation pipeline, governance, 180-day roadmap, Intelligence Room and Control Tower.",
+      "requiresCEOActivation": true
+    }
+  ],
+  "programmes": {
+    "founding25": {
+      "status": "limited_campaign_requires_live_availability_check",
+      "baseProductCode": "INDIA_MARKET_INTELLIGENCE_FLAGSHIP",
+      "priceUSD": 7500,
+      "futureCreditUSD": 1000,
+      "foundersCircleMonths": 12,
+      "seatCountMustBeReadFromLiveCampaignRegistry": true
+    },
+    "foundingPartnerSales": {
+      "status": "campaign_terms_require_eligibility_and_window_validation",
+      "productCode": "INDIA_MARKET_INTELLIGENCE_FLAGSHIP",
+      "seatLimit": 20,
+      "tiers": [
+        {
+          "name": "STARTER",
+          "bookingAmountUSD": 250,
+          "closingWindowDays": 7,
+          "commissionUSD": 1500,
+          "commissionPercent": 20
+        },
+        {
+          "name": "PRIORITY",
+          "bookingAmountUSD": 500,
+          "closingWindowDays": 14,
+          "commissionUSD": 2250,
+          "commissionPercent": 30
+        },
+        {
+          "name": "EXCLUSIVE",
+          "bookingAmountUSD": 1000,
+          "closingWindowDays": 21,
+          "commissionUSD": 3000,
+          "commissionPercent": 40
+        }
+      ],
+      "rules": [
+        "Validate active seat availability before presenting an offer.",
+        "Apply only approved written terms and eligibility rules.",
+        "Do not promise commission before qualifying order and payment conditions are met.",
+        "Booking/refund conditions must be displayed from the currently approved agreement."
+      ]
+    }
+  }
+}
